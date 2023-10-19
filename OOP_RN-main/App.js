@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState , useEffect} from 'react';
 import {
+  RefreshControl,
   StyleSheet,
   Text,
   View,
@@ -25,11 +26,15 @@ const Tab = createBottomTabNavigator();
 
 const imageSources = recipes;
 
+const timesNewRomanFont = 'Times New Roman';
+
+
 function HomeScreen() {
   const [selectedFilter, setSelectedFilter] = useState('All');
   const [searchText, setSearchText] = useState('');
   const [isModalVisible, setModalVisible] = useState(false);
   const [selectedFood, setSelectedFood] = useState(null);
+  const [refresh, setRefresh] = useState(false);
 
   const filteredRecipes = imageSources.filter(food => {
     if (selectedFilter === 'All' || food.tag === selectedFilter) {
@@ -55,44 +60,62 @@ function HomeScreen() {
     setModalVisible(false);
   };
 
+  const ref = () => {
+    setRefresh(true)
+
+    setTimeout(()=>{
+      setRefresh(false)
+    }, 2000)
+  }
+
   return (
-    <ScrollView contentContainerStyle={styles.scrollContainer}>
+    <ScrollView contentContainerStyle={styles.scrollContainer} 
+      refreshControl={
+      <RefreshControl
+      refreshing={refresh}
+      onRefresh={()=>ref()}
+    /> 
+    }
+    >
       <View style={styles.container}>
         <Text style={styles.titleText}>Only Foods</Text>
         <TextInput
           style={styles.searchInput}
           placeholder="Search for food..."
-          placeholderTextColor={'white'}
+          placeholderTextColor={'#6D9773'}
           onChangeText={(text) => setSearchText(text)}
           value={searchText}
         />
+        
         <View style={styles.FilterButton}>
           <View style={styles.FilterButton}>
-            <Button title="All" onPress={() => handleFilterClick('All')} />
+            <Button title={"All"} onPress={() => handleFilterClick('All')} color="#DDA15E" />
+          
           </View>
           <View style={styles.FilterButton}>
-            <Button title="Beef" onPress={() => handleFilterClick('beef')} />
+            <Button title="Beef" onPress={() => handleFilterClick('beef')} color="#DDA15E" />
           </View>
           <View style={styles.FilterButton}>
-            <Button title="Chicken" onPress={() => handleFilterClick('chicken')} />
+            <Button title="Chicken" onPress={() => handleFilterClick('chicken') }color="#DDA15E" />
           </View>
           <View style={styles.FilterButton}>
-            <Button title="Pork" onPress={() => handleFilterClick('pork')} />
+            <Button title="Pork" onPress={() => handleFilterClick('pork')}color="#DDA15E" />
           </View>
           <View style={styles.FilterButton}>
-            <Button title="Veggies" onPress={() => handleFilterClick('veggies')} />
+            <Button title="Veggies" onPress={() => handleFilterClick('veggies')} color="#DDA15E"/>
           </View>
           <View style={styles.FilterButton}>
-            <Button title="Fish" onPress={() => handleFilterClick('fish')} />
+            <Button title="Fish" onPress={() => handleFilterClick('fish')}color="#DDA15E" />
           </View>
         </View>
+        
         <Text style={styles.LabelDesign}>Recipe</Text>
         <View style={styles.buttonContainer}>
           {searchedRecipes.map((food, index) => (
             <TouchableHighlight
               key={index}
               style={styles.imageContainer}
-              underlayColor="#ddd"
+              underlayColor="#fff"
               onPress={() => {
                 setSelectedFood(food);
                 setModalVisible(true);
@@ -173,6 +196,7 @@ function AboutUs(){
 function FavoritesScreen() {
   const [isModalVisible, setModalVisible] = useState(false);
   const [selectedFood, setSelectedFood] = useState(null);
+  const [refresh, setRefresh] = useState(false);
 
   const filteredRecipes = imageSources.filter(food => {
     if (food.favorite===true) {
@@ -187,8 +211,22 @@ function FavoritesScreen() {
     setModalVisible(false);
   };
 
+  const ref = () => {
+    setRefresh(true)
+
+    setTimeout(()=>{
+      setRefresh(false)
+    }, 2000)
+  }
+
   return(
-  <ScrollView contentContainerStyle={styles.scrollContainer}>
+  <ScrollView contentContainerStyle={styles.scrollContainer}
+  refreshControl={
+    <RefreshControl
+    refreshing={refresh}
+    onRefresh={()=>ref()}
+  /> 
+  }>
     <View style={styles.container}>
       <Text style={styles.titleText}>Favorites</Text>
       <View style={styles.buttonContainer}>
@@ -256,6 +294,7 @@ function NoteScreen() {
   const [newRecipe, setNewRecipe] = useState('');
   const [notes, setNotes] = useState('');
   const [favoriteRecipes, setFavoriteRecipes] = useState([]);
+  const [refresh, setRefresh] = useState(false);
 
   const addToFavorites = () => {
     if (newRecipe.trim() !== '') {
@@ -274,8 +313,22 @@ function NoteScreen() {
     );
   };
 
+  const ref = () => {
+    setRefresh(true)
+
+    setTimeout(()=>{
+      setRefresh(false)
+    }, 2000)
+  }
+
   return (
-    <View style={styles.containerMisc}>
+    <View style={styles.containerMisc}
+    refreshControl={
+      <RefreshControl
+      refreshing={refresh}
+      onRefresh={()=>ref()}
+    /> 
+    }>
       <Text style={styles.titleText}>Only Notes</Text>
       <Text style={styles.contentText}>This is where you can create your own recipe and lists.</Text>
       <View paddingVertical={20} >
@@ -301,7 +354,7 @@ function NoteScreen() {
           onChangeText={(text) => setNotes(text)}
         />
       </View>
-      <Button title="Add Recipe" onPress={addToFavorites} />
+      <Button title="Add Recipe" onPress={addToFavorites} color="#DDA15E" />
 
       <FlatList
         data={favoriteRecipes}
@@ -327,8 +380,8 @@ export default function App() {
       <Tab.Navigator
       screenOptions={{
         tabBarStyle: { 
-          backgroundColor: '#0F0F0F',
-          borderColor: '#0F0F0F',
+          backgroundColor: '#FEFAE0',
+          borderColor: '#FEFAE0',
           borderWidth: 0,
           borderRadius: 0,
           padding: 10, 
@@ -349,11 +402,10 @@ export default function App() {
                 source={require("./assets/home_.png")}
                 resizeMode='contain'
                 style={{
-                  borderColor: 'black', 
-                  borderWidth: 2, 
+
                   width: focused ? 50 : 35, 
                   height: 35,
-                  tintColor: focused ? 'white' : 'grey',
+                  tintColor: focused ? '#22543d' : 'grey',
                   
               }} 
                 />
@@ -375,11 +427,10 @@ export default function App() {
                 source={require("./assets/fave.png")}
                 resizeMode='contain'
                 style={{
-                  borderColor: 'black', 
-                  borderWidth: 2, 
+              
                   width: focused ? 50 : 35, 
                   height: 35,
-                  tintColor: focused ? 'white' : 'grey',
+                  tintColor: focused ? '#22543d' : 'grey',
               }} 
                 />
               <Text></Text>
@@ -400,11 +451,10 @@ export default function App() {
                 source={require("./assets/about.png")}
                 resizeMode='contain'
                 style={{
-                  borderColor: 'black', 
-                  borderWidth: 2, 
+          
                   width: focused ? 50 : 35, 
                   height: 35,
-                  tintColor: focused ? 'white' : 'grey',
+                  tintColor: focused ? '#22543d' : 'grey',
               }}
                 />
               <Text></Text>
@@ -425,11 +475,10 @@ export default function App() {
                 source={require("./assets/notes.png")}
                 resizeMode='contain'
                 style={{
-                  borderColor: 'black', 
-                  borderWidth: 2, 
+         
                   width: focused ? 50 : 35, 
                   height: 35,
-                  tintColor: focused ? 'white' : 'grey',
+                  tintColor: focused ? '#22543d' : 'grey',
               }}
                 />
               <Text></Text>
@@ -445,13 +494,13 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
-    backgroundColor: '#0F0F0F',
+    backgroundColor: '#0C3B2E',
     alignItems: 'center',
     padding: 20,
   },
   containerMisc: {
     flexGrow: 1,
-    backgroundColor: '#0F0F0F',
+    backgroundColor: '#0C3B2E',
     alignItems: 'flex-start',
     padding: 20,
   },
@@ -460,6 +509,8 @@ const styles = StyleSheet.create({
     fontSize: 46,
     fontWeight: 'bold',
     marginTop: 10,
+    fontFamily: timesNewRomanFont,
+
   },
   buttonContainer: {
     maxHeight: windowHeight*1.2,
@@ -490,7 +541,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
   },
   searchInput: {
-    color: '#F7F7F7',
+    color: '#0C3B2E',
     width: '70%',
     height: 40,
     borderColor: '#61677A',
@@ -499,12 +550,19 @@ const styles = StyleSheet.create({
     padding: 10,
     textAlign: 'center',
     marginVertical: 10,
-    backgroundColor: '#16181d',
+    backgroundColor: '#FEFAE0',
   },
   FilterButton: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginVertical: 10,
+    justifyContent: 'space-evenly',
+    backgroundColor: '#0C3B2E',
+    borderColor: '#0C3B2E',
+    paddingHorizontal: 5,
+    paddingVertical: 1,
+    height: 55,
+    color: "#0C3B2E"
+    
+
   },
   LabelDesign: {
     fontSize: 18,
